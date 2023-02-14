@@ -13,6 +13,8 @@ class Type extends Model
 
     protected $guard_name = 'web';
 
+    protected $guarded = ['id'];
+
     public function items()
     {
         return $this->hasMany(Item::class);
@@ -21,6 +23,11 @@ class Type extends Model
     public function type()
     {
         return $this->belongsTo(self::class);
+    }
+
+    public function template()
+    {
+        return $this->hasOne(Template::class);
     }
 
     public function subType()

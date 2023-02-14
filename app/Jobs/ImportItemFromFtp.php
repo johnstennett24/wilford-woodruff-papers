@@ -23,14 +23,20 @@ class ImportItemFromFtp implements ShouldQueue
 
     protected Item $item;
 
+    public $enable;
+
+    public $download;
+
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(Item $item)
+    public function __construct(Item $item, $enable = 'false', $download = 'false')
     {
         $this->item = $item;
+        $this->enable = $enable;
+        $this->download = $download;
     }
 
     /**
@@ -40,22 +46,27 @@ class ImportItemFromFtp implements ShouldQueue
      */
     public function handle()
     {
-        if ($this->batch()->cancelled()) {
+        if (! empty($this->batch()) && $this->batch()->cancelled()) {
             // Determine if the batch has been cancelled...
             return;
         }
-
+        info('Importing: '.$this->item->name);
         $item = $this->item;
+
+        if (empty($item->ftp_id)) {
+            info($item->ftp_id.' doesn\'t have an FTP Manifest');
+        }
+
         $response = Http::get($item->ftp_id);
         $canvases = $response->json('sequences.0.canvases');
         if (! empty($canvases)) {
             foreach ($canvases as $key => $canvas) {
                 $page = Page::updateOrCreate([
                     'item_id' => $item->id,
-                    'ftp_id' => $canvas['@id'],
-                ], [
                     'name' => $canvas['label'],
-                    'transcript_link' => $canvas['otherContent'][0]['@id'],
+                ], [
+                    'ftp_id' => $canvas['@id'],
+                    'transcript_link' => data_get($canvas, 'otherContent.0.@id', null),
                     'transcript' => $this->convertSubjectTags(
                         (array_key_exists('otherContent', $canvas))
                             ? Http::get($canvas['otherContent'][0]['@id'])->json('resources.0.resource.chars')
@@ -66,7 +77,7 @@ class ImportItemFromFtp implements ShouldQueue
                     'is_blank' => in_array('markedBlank', array_values(data_get($canvas, 'service.pageStatus', []))),
                 ]);
 
-                if (! $page->hasMedia()) {
+                if (! $page->hasMedia() || $this->download == 'true') {
                     $page->clearMediaCollection();
 
                     if (! empty($canvas['images'][0]['resource']['@id'])) {
@@ -119,8 +130,94 @@ class ImportItemFromFtp implements ShouldQueue
         }
 
         $item->ftp_slug = str($response->json('related.0.@id'))->afterLast('/');
+        $item->auto_page_count = $item->pages()->count();
         $item->imported_at = now('America/Denver');
+
+        if ($this->enable == 'true') {
+            if ($item->enabled != true) {
+                $item->added_to_collection_at = now();
+            }
+            $item->enabled = true;
+        }
+
         $item->save();
+
+        // OrderPages::dispatch($item);
+
+        $this->item = $item;
+
+        $this->orderPages();
+        $this->cacheDates();
+    }
+
+    private function orderPages()
+    {
+        $this->item->refresh();
+
+        if ($this->item->items->count() == 0) {
+            $pageSortColumn = $item->page_sort_column ?? 'id';
+            $pages = $this->item->pages->sortBy($pageSortColumn);
+            $pages->each(function ($page) {
+                $page->parent_item_id = $this->item->parent()->id;
+                $page->type_id = $this->item->parent()->type_id;
+                $page->save();
+            });
+
+            Page::setNewOrder($pages->pluck('id')->all());
+
+            $this->item->fresh();
+            $pages = $this->item->pages;
+            $pages->each(function ($page) {
+                $page->full_name = $this->item->name.': Page'.$page->order;
+                $page->save();
+            });
+        } else {
+            $itemPages = collect([]);
+            $this->item->items->sortBy('order')->each(function ($child) use (&$itemPages) {
+                $pageSortColumn = $child->page_sort_column ?? 'id';
+                $itemPages = $itemPages->concat($child->pages->sortBy($pageSortColumn));
+            });
+            $itemPages->each(function ($page) {
+                $page->parent_item_id = $this->item->parent()->id;
+                $page->type_id = $this->item->parent()->type_id;
+                $page->save();
+            });
+
+            Page::setNewOrder($itemPages->pluck('id')->all());
+
+            $this->item->fresh();
+            $pages = $this->item->pages;
+            $pages->each(function ($page) {
+                $page->full_name = $this->item->name.': Page'.$page->order;
+                $page->save();
+            });
+        }
+
+        logger()->info('Page Order Updated for '.$this->item->name);
+    }
+
+    private function cacheDates()
+    {
+        $this->item->refresh();
+
+        if ($this->item->items->count() == 0) {
+            $dates = collect();
+            $this->item->pages->each(function ($page) use (&$dates) {
+                $dates = $dates->concat($page->dates);
+            });
+            $this->item->first_date = optional($dates->sortBy('date')->first())->date;
+        } else {
+            $this->item->first_date = optional($this->item->items->sortBy('date')->first())->first_date;
+        }
+
+        if ($this->item->first_date) {
+            $this->item->decade = floor($this->item->first_date->year / 10) * 10;
+            $this->item->year = $this->item->first_date->year;
+        }
+
+        $this->item->save();
+
+        logger()->info('Dates Cached for '.$this->item->name);
     }
 
     private function convertSubjectTags($transcript)

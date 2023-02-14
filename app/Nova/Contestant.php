@@ -2,12 +2,12 @@
 
 namespace App\Nova;
 
+use App\Nova\Actions\ExportContestants;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Text;
-use Laravel\Nova\Http\Requests\NovaRequest;
 
 class Contestant extends Resource
 {
@@ -106,6 +106,8 @@ class Contestant extends Resource
      */
     public function actions(Request $request)
     {
-        return [];
+        return [
+            new ExportContestants(),
+        ];
     }
 }
