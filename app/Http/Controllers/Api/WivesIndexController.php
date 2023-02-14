@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Event;
+use App\Models\Wife;
 use Illuminate\Http\Request;
 
-class EventIndexController extends Controller
+class WivesIndexController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,17 +15,17 @@ class EventIndexController extends Controller
      */
     public function index(Request $request)
     {
-
-        if ($request -> has('date'))
+        if ($request -> has('marriage_year'))
         {
-            $event = Event::query()-> where('start_at', $request -> get('date'));
+            $wife = Wife::query() -> where('marriage_year', $request -> get('marriage_year'));
         } else
         {
-            $event = Event::query();
+            $wife = Wife::query();
         }
-
-        return $event ->paginate(10);
+        return $wife -> paginate(10);
     }
+
+
 
     /**
      * Store a newly created resource in storage.
@@ -46,7 +46,7 @@ class EventIndexController extends Controller
      */
     public function show($id)
     {
-        return Event::query()->whereKey($id);
+        //
     }
 
     /**
@@ -57,6 +57,17 @@ class EventIndexController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
     {
         //
     }

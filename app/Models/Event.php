@@ -23,7 +23,7 @@ class Event extends Model implements HasMedia
     ];
 
     /**
-     * Get all of the resources that are assigned this item.
+     * Get all the resources that are assigned this item.
      */
     public function items()
     {
@@ -31,7 +31,7 @@ class Event extends Model implements HasMedia
     }
 
     /**
-     * Get all of the resources that are assigned this item.
+     * Get all the resources that are assigned this item.
      */
     public function pages()
     {
@@ -39,7 +39,7 @@ class Event extends Model implements HasMedia
     }
 
     /**
-     * Get all of the photos that are assigned this item.
+     * Get all the photos that are assigned this item.
      */
     public function photos()
     {

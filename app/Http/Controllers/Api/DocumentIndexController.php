@@ -13,22 +13,17 @@ class DocumentIndexController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
-        return Page::query()->paginate(20);
-    }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
+    public function index(Request $request)
     {
-        //
+        if ($request -> has('id'))
+        {
+            $page = Page::query() -> where('id', $request ->get('id'));
+        } else {
+            $page = Page::query();
+        }
+        return $page -> paginate(100);
     }
-
     /**
      * Display the specified resource.
      *
@@ -37,29 +32,6 @@ class DocumentIndexController extends Controller
      */
     public function show($id)
     {
-        //
-    }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
     }
 }
