@@ -4,6 +4,8 @@
 /storage
 /storage/*.key
 /vendor
+/database/env
+/config/env
 .env
 .env.development
 .env.testing
