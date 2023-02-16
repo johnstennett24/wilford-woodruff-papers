@@ -15,7 +15,6 @@ class EventIndexController extends Controller
      */
     public function index(Request $request)
     {
-
         if ($request -> has('date'))
         {
             $event = Event::query()-> where('start_at', $request -> get('date'));
@@ -23,7 +22,6 @@ class EventIndexController extends Controller
         {
             $event = Event::query();
         }
-
         return $event ->paginate(10);
     }
 

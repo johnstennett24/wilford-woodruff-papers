@@ -3,27 +3,28 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Page;
+use App\Models\Child;
 use Illuminate\Http\Request;
 
-class DocumentIndexController extends Controller
+class ChildrenIndexController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-
     public function index(Request $request)
     {
-        if ($request -> has('id'))
+        if ($request -> has('birthdate'))
         {
-            $page = Page::query() -> where('id', $request ->get('id'));
-        } else {
-            $page = Page::query();
+            $children = Child::query() -> where('birthdate', $request -> get('birthdate'));
+        } else
+        {
+            $children = Child::query();
         }
-        return $page -> paginate(10);
+        return $children -> paginate(35);
     }
+
     /**
      * Display the specified resource.
      *
@@ -32,6 +33,6 @@ class DocumentIndexController extends Controller
      */
     public function show($id)
     {
-
+        //
     }
 }

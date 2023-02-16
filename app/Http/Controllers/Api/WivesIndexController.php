@@ -24,9 +24,6 @@ class WivesIndexController extends Controller
         }
         return $wife -> paginate(10);
     }
-
-
-
     /**
      * Store a newly created resource in storage.
      *
