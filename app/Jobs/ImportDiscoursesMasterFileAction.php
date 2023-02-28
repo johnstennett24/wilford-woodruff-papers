@@ -50,13 +50,19 @@ class ImportDiscoursesMasterFileAction implements ShouldQueue
             'pcf_unique_id' => $uniqueID,
         ]);
 
-        $item->manual_page_count = data_get($this->row, 'of_pages');
+        if (! empty(trim(data_get($this->row, 'of_pages')))) {
+            $item->manual_page_count = trim(data_get($this->row, 'of_pages'));
+        }
 
         if (empty($item->pcf_unique_id_prefix)) {
             $item->pcf_unique_id_prefix = 'D';
         }
         if (empty($item->name)) {
-            $item->name = data_get($this->row, 'name_link_in_ftp');
+            if (! empty(data_get($this->row, 'name_link_in_ftp'))) {
+                $item->name = data_get($this->row, 'name_link_in_ftp');
+            } else {
+                $item->name = 'Discourse '.data_get($this->row, 'discourse_date');
+            }
         }
 
         $item->save();

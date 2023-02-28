@@ -50,13 +50,15 @@ class ImportLettersMasterFileAction implements ShouldQueue
             'pcf_unique_id' => $uniqueID,
         ]);
 
-        $item->manual_page_count = data_get($this->row, 'pages');
+        if (! empty(trim(data_get($this->row, 'pages')))) {
+            $item->manual_page_count = trim(data_get($this->row, 'pages'));
+        }
 
         if (empty($item->pcf_unique_id_prefix)) {
             $item->pcf_unique_id_prefix = 'LE';
         }
         if (empty($item->name)) {
-            $item->name = data_get($this->row, 'letters_formula_do_not_edit');
+            $item->name = data_get($this->row, 'letter_name_formula_do_not_edit');
         }
 
         $item->save();

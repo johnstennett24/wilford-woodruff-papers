@@ -2,12 +2,11 @@
 
 namespace App\Imports;
 
-use App\Jobs\ImportDaybooksMasterFileAction;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
-class DaybooksFromPcfActions implements ToCollection, WithHeadingRow
+class AutobiographiesFromPcfActions implements ToCollection, WithHeadingRow
 {
     public $action;
 
@@ -21,7 +20,7 @@ class DaybooksFromPcfActions implements ToCollection, WithHeadingRow
         foreach ($rows as $row) {
             switch ($this->action) {
                 case 'Import Master File':
-                    ImportDaybooksMasterFileAction::dispatch($row);
+
                     break;
             }
         }

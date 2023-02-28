@@ -8,6 +8,7 @@ use App\Models\Item;
 use App\Models\Page;
 use App\Models\Type;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
@@ -19,8 +20,8 @@ class ProgressMatrix extends Component
     ];
 
     protected $queryString = [
-        'dates',
         'currentUserId',
+        'stage',
     ];
 
     public $readyToLoad = false;
@@ -31,21 +32,20 @@ class ProgressMatrix extends Component
 
     public $users;
 
+    public $stage = 3;
+
     public $typesMap = [
         'Letters' => ['Letters'],
         'Discourses' => ['Discourses'],
         'Journals' => ['Journals', 'Journal Sections'],
-        'Additional' => ['Additional'],
+        'Additional' => ['Additional', 'Additional Sections'],
         'Autobiographies' => ['Autobiography Sections', 'Autobiographies'],
         'Daybooks' => ['Daybooks'],
     ];
 
     public function mount()
     {
-        $this->dates = [
-            'start' => request('dates.start') ?? now('America/Denver')->startOfMonth()->subMonthsNoOverflow()->toDateString(),
-            'end' => request('dates.end') ?? now('America/Denver')->subMonthsNoOverflow()->endOfMonth()->toDateString(),
-        ];
+        $this->setDates();
 
         $this->types = ActionType::query()
                             //->role(auth()->user()->roles)
@@ -149,7 +149,7 @@ class ProgressMatrix extends Component
             foreach ($pageStats as $key => $stat) {
                 foreach ($docTypes as $doctype) {
                     $goals[$key][$doctype] = Goal::query()
-                        ->where('type_id', Type::whereIn('name', $this->typesMap[$doctype])->first()->id)
+                        ->whereIn('type_id', Type::whereIn('name', array_values($this->typesMap[$doctype]))->pluck('id')->all())
                         ->where('action_type_id', ActionType::firstWhere('name', $key)->id)
                         ->whereDate('finish_at', '>=', $this->dates['start'])
                         ->whereDate('finish_at', '<=', $this->dates['end'])
@@ -157,7 +157,7 @@ class ProgressMatrix extends Component
 
                     $goalPercentages[$key][$doctype] = 0;
                     if ($goals[$key][$doctype] > 0) {
-                        $goalPercentages[$key][$doctype] = (intval(($stat->whereIn('document_type', $this->typesMap[$doctype])->first()?->total / $goals[$key][$doctype]) * 100));
+                        $goalPercentages[$key][$doctype] = (intval(($stat->whereIn('document_type', $this->typesMap[$doctype])->sum('total') / $goals[$key][$doctype]) * 100));
                     }
                 }
             }
@@ -177,13 +177,45 @@ class ProgressMatrix extends Component
                         ->whereRelation('type', function ($query) use ($doctype) {
                             $query->whereIn('name', $this->typesMap[$doctype]);
                         })
-                        ->sum('auto_page_count');
+                        ->sum('auto_page_count')
+                    + Item::query()
+                        ->where('missing_page_count', '>', 0)
+                        ->whereRelation('type', function ($query) use ($doctype) {
+                            $query->whereIn('name', $this->typesMap[$doctype]);
+                        })
+                        ->sum('missing_page_count');
+            }
+
+            $totalCounts = [];
+            foreach ($docTypes as $doctype) {
+                $totalCounts[$doctype] = Page::query()
+                    ->whereHas('actions', function (Builder $query) {
+                        $query->where('action_type_id', $this->types->firstWhere('name', 'Transcription')->id)
+                            ->whereNotNull('completed_at');
+                    })
+                    ->whereHas('actions', function (Builder $query) {
+                        $query->where('action_type_id', $this->types->firstWhere('name', 'Verification')->id)
+                            ->whereNotNull('completed_at');
+                    })
+                    ->whereHas('actions', function (Builder $query) {
+                        $query->where('action_type_id', $this->types->firstWhere('name', 'Publish')->id)
+                            ->whereNotNull('completed_at');
+                    })
+                    ->whereHas('actions', function (Builder $query) {
+                        $query->where('action_type_id', $this->types->firstWhere('name', 'Stylization')->id)
+                            ->whereNotNull('completed_at');
+                    })
+                    ->whereRelation('item.type', function ($query) use ($doctype) {
+                        $query->whereIn('name', $this->typesMap[$doctype]);
+                    })
+                    ->count();
             }
         } else {
             $pageStats = [];
             $goals = [];
             $goalPercentages = [];
             $pageCounts = [];
+            $totalCounts = [];
             $subjectStats = [
                 'identify_people' => [
                     'actual' => 0,
@@ -210,6 +242,7 @@ class ProgressMatrix extends Component
             'docTypes' => $docTypes,
             'subjectStats' => $subjectStats,
             'pageCounts' => $pageCounts,
+            'totalCounts' => $totalCounts,
 
         ])
             ->layout('layouts.admin');
@@ -219,8 +252,37 @@ class ProgressMatrix extends Component
     {
     }
 
+    public function updatedStage()
+    {
+        $this->setDates();
+    }
+
     public function loadStats()
     {
         $this->readyToLoad = true;
+    }
+
+    private function setDates()
+    {
+        switch ($this->stage) {
+            case 1:
+                $this->dates = [
+                    'start' => '2020-03-01',
+                    'end' => '2021-02-28',
+                ];
+                break;
+            case 2:
+                $this->dates = [
+                    'start' => '2021-03-01',
+                    'end' => '2022-02-28',
+                ];
+                break;
+            case 3:
+                $this->dates = [
+                    'start' => '2022-03-01',
+                    'end' => '2023-02-28',
+                ];
+                break;
+        }
     }
 }
