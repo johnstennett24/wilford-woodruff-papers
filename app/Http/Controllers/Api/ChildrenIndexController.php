@@ -15,14 +15,12 @@ class ChildrenIndexController extends Controller
      */
     public function index(Request $request)
     {
-        if ($request -> has('birthdate'))
-        {
-            $children = Child::query() -> where('birthdate', $request -> get('birthdate'));
-        } else
-        {
-            $children = Child::query();
-        }
-        return $children -> paginate(35);
+        $children = Child::query()
+            ->when($request->get('birthdate'), function ($query, $birthdate) {
+                return $query->where('birthdate', $birthdate);
+            });
+
+        return $children->get();
     }
 
     /**

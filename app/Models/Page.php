@@ -74,6 +74,14 @@ class Page extends Model implements HasMedia, \OwenIt\Auditing\Contracts\Auditab
         return $this->belongsToMany(Subject::class);
     }
 
+    public function people()
+    {
+        return $this->belongsToMany(Subject::class)
+            ->whereHas('category', function (Builder $query) {
+                $query->where('name', 'People');
+            });
+    }
+
     public function topics()
     {
         return $this->belongsToMany(Subject::class)

@@ -13,25 +13,30 @@ class DocumentIndexController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-
     public function index(Request $request)
     {
-        if ($request -> has('id'))
-        {
-            $page = Page::query() -> where('id', $request ->get('id'));
-        } else {
-            $page = Page::query();
-        }
-        return $page -> paginate(10);
+        $pages = Page::query();
+
+        $pages = $pages->with(
+            [
+                'item',
+                'people',
+                'text',
+                'events',
+            ]
+        );
+
+        return response()->json($pages->paginate($request->get('per_page', 100)));
     }
+
     /**
      * Display the specified resource.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Page $page)
     {
-
+        return $page;
     }
 }
