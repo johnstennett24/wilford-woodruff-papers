@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Http\Livewire\Places;
 use Dyrynda\Database\Casts\EfficientUuid;
 use Dyrynda\Database\Support\GeneratesUuid;
 use Illuminate\Database\Eloquent\Builder;
@@ -201,5 +202,23 @@ class Page extends Model implements HasMedia, \OwenIt\Auditing\Contracts\Auditab
     {
         return LogOptions::defaults()
                 ->dontLogIfAttributesChangedOnly(['transcript']);
+    }
+
+    public function places()
+    {
+        return $this->morphMany(Places::render(), 'places');
+    }
+
+    public function toArray()
+    {
+        return [
+            'full_name' => $this->full_name,
+            'name' => $this->name,
+            'date' => $this->dates(),
+            'transcript' => $this->transcript,
+            'people' => $this->people(),
+            'places' => $this->places(),
+            'image_url' => $this->getFirstMedia()?->getUrl(),
+        ];
     }
 }

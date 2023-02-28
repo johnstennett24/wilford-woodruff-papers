@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Page;
 use Illuminate\Http\Request;
+use Matrix\Builder;
 
 class DocumentIndexController extends Controller
 {
@@ -17,14 +18,16 @@ class DocumentIndexController extends Controller
     {
         $pages = Page::query();
 
-        $pages = $pages->with(
-            [
-                'item',
-                'people',
-                'text',
-                'events',
-            ]
-        );
+        if ($request->has('date')) {
+            $pages = $pages->whereRelation('dates', function (Builder $query) use ($request) {
+                $query->whereDate('date', $request->get('date'));
+            });
+            if ($request->has('Journal')) {
+                $pages = $pages->where('full_name', 'LIKE', '%'.'Journal'.'%');
+            } elseif ($request->has('Letter')) {
+                $pages = $pages->where('full_name', 'LIKE', '%'.'Letter'.'%');
+            }
+        }
 
         return response()->json($pages->paginate($request->get('per_page', 100)));
     }
