@@ -83,6 +83,14 @@ class Page extends Model implements HasMedia, \OwenIt\Auditing\Contracts\Auditab
             });
     }
 
+    public function places()
+    {
+        return $this->belongsToMany(Subject::class)
+            ->whereHas('category', function (Builder $query) {
+                $query->where('name', 'Places');
+            });
+    }
+
     public function topics()
     {
         return $this->belongsToMany(Subject::class)
@@ -204,20 +212,15 @@ class Page extends Model implements HasMedia, \OwenIt\Auditing\Contracts\Auditab
                 ->dontLogIfAttributesChangedOnly(['transcript']);
     }
 
-    public function places()
-    {
-        return $this->morphMany(Places::render(), 'places');
-    }
-
     public function toArray()
     {
         return [
             'full_name' => $this->full_name,
             'name' => $this->name,
-            'date' => $this->dates(),
+            'date' => $this->dates,
             'transcript' => $this->transcript,
-            'people' => $this->people(),
-            'places' => $this->places(),
+            'people' => $this->people,
+            'places' => $this->places,
             'image_url' => $this->getFirstMedia()?->getUrl(),
         ];
     }
