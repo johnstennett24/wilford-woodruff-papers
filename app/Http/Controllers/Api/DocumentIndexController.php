@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Page;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Matrix\Builder;
 
 class DocumentIndexController extends Controller
 {
@@ -22,11 +22,12 @@ class DocumentIndexController extends Controller
             $pages = $pages->whereRelation('dates', function (Builder $query) use ($request) {
                 $query->whereDate('date', $request->get('date'));
             });
-            if ($request->has('Journal')) {
-                $pages = $pages->where('full_name', 'LIKE', '%'.'Journal'.'%');
-            } elseif ($request->has('Letter')) {
-                $pages = $pages->where('full_name', 'LIKE', '%'.'Letter'.'%');
+        }
+        if ($request->has('types')) {
+            $pages = $pages->whereRelation('item.type', function (Builder $query) use ($request) {
+                $query->whereIn('name', $request->get('types'));
             }
+            );
         }
 
         return response()->json($pages->paginate($request->get('per_page', 100)));
