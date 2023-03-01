@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Http\Livewire\Places;
 use Dyrynda\Database\Casts\EfficientUuid;
 use Dyrynda\Database\Support\GeneratesUuid;
 use Illuminate\Database\Eloquent\Builder;
