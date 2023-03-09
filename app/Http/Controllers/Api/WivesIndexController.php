@@ -15,13 +15,18 @@ class WivesIndexController extends Controller
      */
     public function index(Request $request)
     {
+        $wives = Wife::query();
         if ($request->has('marriage_year')) {
-            $wife = Wife::query()->where('marriage_year', $request->get('marriage_year'));
-        } else {
-            $wife = Wife::query();
+            $wives = $wives->where('marriage_year');
+        }
+        if ($request->has('divorce')) {
+            $wives = $wives->where('divorce');
+        }
+        if ($request->has('name')) {
+            $wives = $wives->where('name');
         }
 
-        return $wife->get();
+        return response()->json($wives->paginate($request->get('per_page', 100)));
     }
 
     /**
@@ -30,8 +35,8 @@ class WivesIndexController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Wife $wife)
     {
-        //
+        return $wife;
     }
 }

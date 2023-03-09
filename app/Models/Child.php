@@ -18,4 +18,14 @@ class Child extends Model
     {
         return $this->belongsTo(Wife::class);
     }
+
+    public function toArray()
+    {
+        return [
+            'name' => $this->name,
+            'gender' => $this->gender,
+            'birthdate' => $this->birthdate,
+            'birthplace' => $this->birthplace,
+        ];
+    }
 }

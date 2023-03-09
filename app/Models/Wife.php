@@ -18,4 +18,15 @@ class Wife extends Model
     {
         return $this->hasMany(Child::class);
     }
+
+    public function toArray()
+    {
+        return [
+            'name' => $this->name,
+            'marriage_year' => $this->marriage_year,
+            'mother' => $this->mother,
+            'father' => $this->father,
+            'children' => $this->children(),
+        ];
+    }
 }

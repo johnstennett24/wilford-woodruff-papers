@@ -15,12 +15,13 @@ class ChildrenIndexController extends Controller
      */
     public function index(Request $request)
     {
-        $children = Child::query()
-            ->when($request->get('birthdate'), function ($query, $birthdate) {
-                return $query->where('birthdate', $birthdate);
-            });
+        $children = Child::query();
 
-        return $children->get();
+        if ($request->has('gender')) {
+            $children = $children->where('gender', $request);
+        }
+
+        return response()->json($children->paginate($request->get('per_page', 100)));
     }
 
     /**
@@ -29,8 +30,8 @@ class ChildrenIndexController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Child $child)
     {
-        //
+        return $child;
     }
 }
