@@ -18,6 +18,7 @@ class ExportPages extends DownloadExcel implements WithMapping, WithHeadings
             'Internal ID',
             'Document Type',
             'Parent ID',
+            'Order',
             'Parent Name',
             'UUID',
             'Name',
@@ -28,6 +29,7 @@ class ExportPages extends DownloadExcel implements WithMapping, WithHeadings
             'Text Only Transcript',
             'People',
             'Places',
+            'First Date',
             'Dates',
             'Topics',
         ];
@@ -45,6 +47,7 @@ class ExportPages extends DownloadExcel implements WithMapping, WithHeadings
             $page->id,
             optional($page->parent?->type)->name,
             $page->parent_item_id,
+            $page->order,
             $page->parent?->name,
             $page->uuid,
             $page->name,
@@ -59,8 +62,11 @@ class ExportPages extends DownloadExcel implements WithMapping, WithHeadings
             $page->subjects()->whereHas('category', function (Builder $query) {
                 $query->where('name', 'Places');
             })->pluck('subjects.name')->join('|'),
-            $page->dates()->pluck('date')->join('|'),
-            $page->topics->pluck('name')->join('|'),
+            $page->first_date,
+            $page->taggedDates->map(function ($date) {
+                return $date->date->toDateString();
+            })->join('|'),
+            $page->topics()->pluck('name')->join('|'),
         ];
     }
 }

@@ -211,6 +211,10 @@ Route::group(['middleware' => ['role:Super Admin|Editor']], function () {
         ->name('admin.dashboard.quotes.index');
 
     Route::middleware(['auth:sanctum', 'verified'])
+        ->get('/admin/search/quotes', App\Http\Livewire\Admin\Quotes\Search::class)
+        ->name('admin.quotes.search');
+
+    Route::middleware(['auth:sanctum', 'verified'])
         ->get('/admin/dashboard/quotes/{quote}', [\App\Http\Controllers\Admin\QuoteController::class, 'show'])
         ->name('admin.dashboard.quotes.show');
 
@@ -277,4 +281,12 @@ Route::group(['middleware' => ['role:Super Admin|Editor']], function () {
     Route::middleware(['auth:sanctum', 'verified'])
         ->get('/admin/objectives', \App\Http\Livewire\Admin\Stage::class)
         ->name('admin.reports.objectives');
+
+    Route::middleware(['auth:sanctum', 'verified'])
+        ->get('/admin/export-transcripts', \App\Http\Controllers\Admin\ExportItemFullTranscriptController::class)
+        ->name('admin.items.export-transcripts');
+
+    Route::middleware(['auth:sanctum', 'verified'])
+        ->get('/admin/search/documents', \App\Http\Livewire\Admin\Documents\Search::class)
+        ->name('admin.documents.search');
 });
