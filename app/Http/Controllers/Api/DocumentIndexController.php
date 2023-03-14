@@ -18,6 +18,13 @@ class DocumentIndexController extends Controller
     {
         $pages = Page::query();
 
+        $pages->with([
+            'dates',
+            'people',
+            'places',
+            'media',
+        ]);
+
         if ($request->has('date')) {
             $pages = $pages->whereRelation('dates', function (Builder $query) use ($request) {
                 $query->whereDate('date', $request->get('date'));

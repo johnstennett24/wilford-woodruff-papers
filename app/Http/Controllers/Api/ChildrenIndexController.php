@@ -17,10 +17,6 @@ class ChildrenIndexController extends Controller
     {
         $children = Child::query();
 
-        if ($request->has('gender')) {
-            $children = $children->where('gender', $request);
-        }
-
         return response()->json($children->paginate($request->get('per_page', 100)));
     }
 

@@ -16,15 +16,9 @@ class WivesIndexController extends Controller
     public function index(Request $request)
     {
         $wives = Wife::query();
-        if ($request->has('marriage_year')) {
-            $wives = $wives->where('marriage_year');
-        }
-        if ($request->has('divorce')) {
-            $wives = $wives->where('divorce');
-        }
-        if ($request->has('name')) {
-            $wives = $wives->where('name');
-        }
+        $wives->with([
+            'children',
+        ]);
 
         return response()->json($wives->paginate($request->get('per_page', 100)));
     }

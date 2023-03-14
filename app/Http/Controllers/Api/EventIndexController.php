@@ -15,13 +15,17 @@ class EventIndexController extends Controller
      */
     public function index(Request $request)
     {
+        $event = Event::query();
+
+        $event->with([
+            'media',
+        ]);
+
         if ($request->has('date')) {
-            $event = Event::query()->where('start_at', $request->get('date'));
-        } else {
-            $event = Event::query();
+            $event = $event->where('start_at', $request->get('date'));
         }
 
-        return $event->paginate(10);
+        return response()->json($event->paginate($request->get('per_page', 100)));
     }
 
     /**
