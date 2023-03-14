@@ -26,7 +26,7 @@ class Wife extends Model
             'marriage_year' => $this->marriage_year,
             'mother' => $this->mother,
             'father' => $this->father,
-            'children' => $this->children(),
+            'children' => $this->children,
         ];
     }
 }
