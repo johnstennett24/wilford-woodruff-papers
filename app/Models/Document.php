@@ -14,4 +14,24 @@ class Document extends Item
     {
         return $this->hasMany(Page::class)->orderBy('order', 'ASC');
     }
+
+    public function getFirstMedia(string $collectionName = 'default', $filters = []): ?Media
+    {
+        $media = $this->getMedia($collectionName, $filters);
+
+        return $media->first();
+    }
+
+    public function toArray()
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'people' => $this->people,
+            'places' => $this->places,
+            'topics' => $this->topics,
+            'dates' => $this->dates,
+            //          'image_url' => $this->getFirstMedia()?->getUrl(),
+        ];
+    }
 }

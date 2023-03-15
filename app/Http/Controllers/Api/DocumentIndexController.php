@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Page;
+use App\Models\Document;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
@@ -16,28 +16,27 @@ class DocumentIndexController extends Controller
      */
     public function index(Request $request)
     {
-        $pages = Page::query();
+        $documents = Document::query();
 
-        $pages->with([
-            'dates',
-            'people',
-            'places',
-            'media',
-        ]);
+        if ($request->has('name')) {
+            $documents = $documents->whereRelation('name', function (Builder $query) use ($request) {
+                $query->where('name' == $request);
+            });
+        }
 
         if ($request->has('date')) {
-            $pages = $pages->whereRelation('dates', function (Builder $query) use ($request) {
+            $documents = $documents->whereRelation('dates', function (Builder $query) use ($request) {
                 $query->whereDate('date', $request->get('date'));
             });
         }
         if ($request->has('types')) {
-            $pages = $pages->whereRelation('item.type', function (Builder $query) use ($request) {
+            $documents = $documents->whereRelation('item.type', function (Builder $query) use ($request) {
                 $query->whereIn('name', $request->get('types'));
             }
             );
         }
 
-        return response()->json($pages->paginate($request->get('per_page', 100)));
+        return response()->json($documents->paginate($request->get('per_page', 100)));
     }
 
     /**
@@ -46,8 +45,8 @@ class DocumentIndexController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Page $page)
+    public function show(Document $document)
     {
-        return $page;
+        return $document;
     }
 }

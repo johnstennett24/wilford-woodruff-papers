@@ -27,6 +27,10 @@ class Wife extends Model
             'mother' => $this->mother,
             'father' => $this->father,
             'children' => $this->children,
+            'links' => [
+                'frontend_url' => route('subjects.show', ['subject' => Subject::find($this->person_id)]),
+                'api_url' => route('api.children.show', ['child' => Subject::find($this->person_id)]),
+            ],
         ];
     }
 }
