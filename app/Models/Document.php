@@ -26,12 +26,17 @@ class Document extends Item
     {
         return [
             'id' => $this->id,
+            'uuid' => $this->uuid,
             'name' => $this->name,
             'people' => $this->people,
             'places' => $this->places,
             'topics' => $this->topics,
             'dates' => $this->dates,
             //          'image_url' => $this->getFirstMedia()?->getUrl(),
+            'links' => [
+                'frontend_url' => route('subjects.show', ['subject' => Subject::find($this->id)]),
+                'api_url' => route('api.documents.show', ['document' => Subject::find($this->id)]),
+            ],
         ];
     }
 }

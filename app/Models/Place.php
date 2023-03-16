@@ -32,4 +32,11 @@ class Place extends Model
     {
         return 'slug';
     }
+
+    public function toArray()
+    {
+        return [
+            'name' => $this->name,
+        ];
+    }
 }

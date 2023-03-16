@@ -219,6 +219,8 @@ class Page extends Model implements HasMedia, \OwenIt\Auditing\Contracts\Auditab
     public function toArray()
     {
         return [
+            'id' => $this->id,
+            'uuid' => $this->uuid,
             'full_name' => $this->full_name,
             'name' => $this->name,
             'date' => $this->dates,

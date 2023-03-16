@@ -24,10 +24,12 @@ Route::get('/pages/{page}', [\App\Http\Controllers\Api\PageIndexController::clas
 Route::get('/events', [\App\Http\Controllers\Api\EventIndexController::class, 'index']);
 Route::get('/events/{event}', [\App\Http\Controllers\Api\EventIndexController::class, 'show']);
 Route::get('/wives', [\App\Http\Controllers\Api\WivesIndexController::class, 'index']);
-Route::get('/wives/{wife}}', [\App\Http\Controllers\Api\WivesIndexController::class, 'show']);
+Route::get('/wives/{wife}', [\App\Http\Controllers\Api\WivesIndexController::class, 'show']);
 Route::get('/children', [\App\Http\Controllers\Api\ChildrenIndexController::class, 'index']);
 Route::get('/children/{child}', [\App\Http\Controllers\Api\ChildrenIndexController::class, 'show']);
 Route::get('/people', [\App\Http\Controllers\Api\PeopleIndexController::class, 'index']);
 Route::get('/people/{person slug}', [\App\Http\Controllers\Api\PeopleIndexController::class, 'show']);
 Route::get('/documents', [\App\Http\Controllers\Api\DocumentIndexController::class, 'index']);
-Route::get('/document/{document}', [\App\Http\Controllers\Api\DocumentIndexController::class, 'show']);
+Route::get('/documents/{document}', [\App\Http\Controllers\Api\DocumentIndexController::class, 'show']);
+Route::get('/place', [\App\Http\Controllers\Api\PlaceIndexController::class, 'index']);
+Route::get('/place/{place}', [\App\Http\Controllers\Api\PlaceIndexController::class, 'show']);
