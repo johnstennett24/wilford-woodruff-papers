@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Place;
+use App\Models\Subject;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 
 class PlaceIndexController extends Controller
 {
@@ -14,9 +16,11 @@ class PlaceIndexController extends Controller
      */
     public function index(Request $request)
     {
-        $place = Place::query();
+        $places = Subject::query()->whereHas('category', function (Builder $query) {
+            $query->where('name', 'Places');
+        });
 
-        return response()->json($place->paginate($request->get('per_page', 100)));
+        return response()->json($places->paginate($request->get('per_page', 100)));
     }
 
     /**
@@ -25,7 +29,7 @@ class PlaceIndexController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Place $place)
+    public function show(Subject $place)
     {
         return $place;
     }

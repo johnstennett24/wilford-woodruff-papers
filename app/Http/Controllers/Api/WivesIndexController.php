@@ -16,9 +16,6 @@ class WivesIndexController extends Controller
     public function index(Request $request)
     {
         $wives = Wife::query();
-        $wives->with([
-            'children',
-        ]);
 
         return response()->json($wives->paginate($request->get('per_page', 100)));
     }

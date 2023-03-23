@@ -4,10 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Subject;
+use App\Nova\Topic;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
-class PeopleIndexController extends Controller
+class TopicIndexController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,11 +17,11 @@ class PeopleIndexController extends Controller
      */
     public function index(Request $request)
     {
-        $person = Subject::query()->whereHas('category', function (Builder $query) {
-            $query->where('name', 'People');
+        $topic = Subject::query()->whereHas('category', function (Builder $query) use ($request) {
+            $query->where('name', $request);
         });
 
-        return response()->json($person->paginate($request->get('per_page', 100)));
+        return response()->json($topic->paginate($request->get('per_page', 100)));
     }
 
     /**
@@ -29,8 +30,8 @@ class PeopleIndexController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Person $person)
+    public function show(Topic $topic)
     {
-        return $person;
+        return $topic;
     }
 }

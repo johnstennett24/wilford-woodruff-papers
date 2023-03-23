@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Parental\HasParent;
 
@@ -22,17 +23,21 @@ class Document extends Item
         return $media->first();
     }
 
+    public function people()
+    {
+        return $this->hasManyThrough(Subject::class, Page::class)->whereHas('category', function (Builder $query) {
+            $query->where('name', 'People');
+        });
+    }
+
     public function toArray()
     {
         return [
             'id' => $this->id,
             'uuid' => $this->uuid,
             'name' => $this->name,
-            'people' => $this->people,
-            'places' => $this->places,
-            'topics' => $this->topics,
-            'dates' => $this->dates,
-            //          'image_url' => $this->getFirstMedia()?->getUrl(),
+            'first_date' => $this->first_date?->toDateString(),
+            'image_url' => $this->firstPage?->getFirstMedia()?->getUrl('thumb'),
             'links' => [
                 'frontend_url' => route('subjects.show', ['subject' => Subject::find($this->id)]),
                 'api_url' => route('api.documents.show', ['document' => Subject::find($this->id)]),
