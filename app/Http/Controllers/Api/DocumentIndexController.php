@@ -23,6 +23,24 @@ class DocumentIndexController extends Controller
                 $query->where('name' == $request);
             });
         }
+        if ($request->has('date_start') && $request->has('date_end')) {
+            $documents = $documents->whereRelation('date', function (Builder $query) use ($request) {
+                $query->whereDate('date', '>=', $request->get('date_start'))
+                    ->whereDate('date', '<=', $request->get('date_end'));
+            });
+        } else {
+            if ($request->has('date_start')) {
+                $documents = $documents->whereRelation('date', function (Builder $query) use ($request) {
+                    $query->whereDate('date', '>=', $request->get('date_start'));
+                });
+            }
+
+            if ($request->has('date_end')) {
+                $documents = $documents->whereRelation('date', function (Builder $query) use ($request) {
+                    $query->whereDate('date', '<=', $request->get('date_end'));
+                });
+            }
+        }
 
         if ($request->has('date')) {
             $documents = $documents->whereRelation('dates', function (Builder $query) use ($request) {

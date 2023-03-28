@@ -26,9 +26,27 @@ class PageIndexController extends Controller
         ]);
 
         if ($request->has('date')) {
-            $pages = $pages->whereRelation('dates', function (Builder $query) use ($request) {
+            $pages = $pages->whereRelation('taggedDates', function (Builder $query) use ($request) {
                 $query->whereDate('date', $request->get('date'));
             });
+        }
+        if ($request->has('date_start') && $request->has('date_end')) {
+            $pages = $pages->whereRelation('taggedDates', function (Builder $query) use ($request) {
+                $query->whereDate('date', '>=', $request->get('date_start'))
+                ->whereDate('date', '<=', $request->get('date_end'));
+            });
+        } else {
+            if ($request->has('date_start')) {
+                $pages = $pages->whereRelation('taggedDates', function (Builder $query) use ($request) {
+                    $query->whereDate('date', '>=', $request->get('date_start'));
+                });
+            }
+
+            if ($request->has('date_end')) {
+                $pages = $pages->whereRelation('taggedDates', function (Builder $query) use ($request) {
+                    $query->whereDate('date', '<=', $request->get('date_end'));
+                });
+            }
         }
         if ($request->has('types')) {
             $pages = $pages->whereRelation('item.type', function (Builder $query) use ($request) {

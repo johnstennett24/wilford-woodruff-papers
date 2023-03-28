@@ -223,7 +223,7 @@ class Page extends Model implements HasMedia, \OwenIt\Auditing\Contracts\Auditab
             'uuid' => $this->uuid,
             'full_name' => $this->full_name,
             'name' => $this->name,
-            'date' => $this->dates,
+            'date' => $this->taggedDates,
             'transcript' => $this->transcript,
             'people' => $this->people,
             'places' => $this->places,
