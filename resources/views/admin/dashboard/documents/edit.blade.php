@@ -62,8 +62,12 @@
                         <!-- Fields section -->
                         <div class="py-6 px-4 sm:p-6 lg:pb-8">
                             <div>
-                                <h2 class="text-lg font-medium leading-6 text-gray-900">{{ $item->name }}</h2>
-                                <p class="mt-1 text-sm text-gray-500"></p>
+                                <h2 class="text-xl font-bold leading-6 text-gray-900">
+                                    {{ $item->name }}
+                                </h2>
+                                <p class="mt-1 text-base font-semibold text-gray-500">
+                                    {{ $item->pcf_unique_id_full }}
+                                </p>
                             </div>
 
                             <div class="grid grid-cols-12 gap-6 mt-6">
@@ -151,7 +155,14 @@
                                     <input type="text" name="first-name" id="first-name" autocomplete="given-name" class="block py-2 px-3 mt-1 w-full rounded-md border border-gray-300 shadow-sm sm:text-sm focus:outline-none focus:border-sky-500 focus:ring-sky-500">
                                 </div>--}}
 
-                                @foreach($item->type->template->properties as $property)
+                                @php
+                                    $template = $item->type->template;
+                                    if(! empty($item->type->type_id)) {
+                                        $template = $item->type->type->template;
+                                    }
+                                @endphp
+
+                                @foreach($template->properties as $property)
                                     <div class="col-span-{{ $property->width ?? 12 }}">
                                         @switch($property->type)
                                             @case('link')

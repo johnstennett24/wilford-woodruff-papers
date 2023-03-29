@@ -1,5 +1,6 @@
 <div x-data="{
             shadow: false
+            perPage: @entagle('perPage'),
         }">
     <div class="grid grid-cols-12 gap-x-4">
         <div class="col-span-12 pr-8">
@@ -38,31 +39,29 @@
                                 </x-input.group>
                             </div>
 
-                            <div>
+                            {{--<div>
                                 <x-dropdown label="Bulk Actions">
-                                    {{--<x-dropdown.item type="button" wire:click="exportSelected" class="flex items-center space-x-2">
+                                    --}}{{--<x-dropdown.item type="button" wire:click="exportSelected" class="flex items-center space-x-2">
                                         <x-icon.download class="text-cool-gray-400"/> <span>Export</span>
-                                    </x-dropdown.item>--}}
+                                    </x-dropdown.item>--}}{{--
                                     @foreach($taskTypes as $taskType)
                                         <x-dropdown.item type="button" wire:click="addTasksInBulk({{ $taskType->id }})" class="flex items-center space-x-2">
-                                            {{--<x-icon.trash class="text-cool-gray-400"/>--}} <span>Add {{ $taskType->name }} Task</span>
+                                            --}}{{--<x-icon.trash class="text-cool-gray-400"/>--}}{{-- <span>Add {{ $taskType->name }} Task</span>
                                         </x-dropdown.item>
                                     @endforeach
 
                                 </x-dropdown>
-                            </div>
+                            </div>--}}
 
 
 
                             {{--<livewire:import-transactions />--}}
 
-                            @if(auth()->user()->hasAnyRole(['Super Admin']))
-                                <div class="py-2">
-                                    <a href="{{ route('admin.dashboard.document.create') }}"
-                                       class="py-2 px-4 text-white bg-indigo-600 border-indigo-600 hover:bg-indigo-500 active:bg-indigo-700"
-                                    ><x-icon.plus/> New</a>
-                                </div>
-                            @endif
+                            <div class="py-2">
+                                <a href="{{ route('admin.dashboard.document.create') }}"
+                                   class="py-2 px-4 text-white bg-indigo-600 border-indigo-600 hover:bg-indigo-500 active:bg-indigo-700"
+                                ><x-icon.plus/> New</a>
+                            </div>
                         </div>
                     </div>
 
@@ -130,6 +129,14 @@
                             Name
                         </x-admin.quotes.heading>
 
+                        <x-admin.quotes.heading class="px-2 text-center whitespace-nowrap">
+                            Actual Page Count
+                        </x-admin.quotes.heading>
+
+                        <x-admin.quotes.heading class="px-2 text-center whitespace-nowrap">
+                            Estimated Page Count
+                        </x-admin.quotes.heading>
+
                         @foreach($columns->reject(function ($value, $key) {
                                     return str($value)->contains('Link');
                         }) as $column)
@@ -166,29 +173,43 @@
                                 </x-admin.quotes.cell>
 
                                 <x-admin.quotes.cell class="bg-gray-50 border border-gray-400">
-                                    <span href="#" class="inline-flex space-x-2 text-sm leading-5 truncate">
+                                    <div class="inline-flex space-x-2 text-sm leading-5 whitespace-nowrap">
                                         {{ $item->pcf_unique_id_full }}
-                                    </span>
+                                    </div>
                                 </x-admin.quotes.cell>
 
                                 <x-admin.quotes.cell class="bg-gray-50 border border-gray-400">
-                                    <span class="text-cool-gray-900">{{ str($item->type?->name)->singular() }} </span>
+                                    <span class="text-cool-gray-900 whitespace-nowrap">
+                                        {{ str($item->type?->name)->singular() }}
+                                    </span>
                                 </x-admin.quotes.cell>
 
                                 <x-admin.quotes.cell class="sticky left-0 py-0 px-0 bg-gray-50 border border-gray-400">
                                     <div class="w-full h-full border-r-2 border-gray-400">
-                                        <div href="#" class="inline-flex py-4 px-6 space-x-2 text-sm leading-5 truncate">
+                                        <div href="#" class="py-4 px-6 space-x-2 text-sm leading-5">
                                             {{--<x-icon.cash class="text-cool-gray-400"/>--}}
 
-                                            <p class="flex gap-x-1 items-center text-cool-gray-600 truncate">
+                                            <p class="flex gap-x-1 items-center w-96 text-cool-gray-600">
                                                 <x-icon.status :status="$item->enabled"/>
-                                                <a class="font-medium text-indigo-600"
-                                                   href="{{ route('admin.dashboard.document', ['item' => $item]) }}"
+                                                <a class="font-medium text-indigo-600 break-word"
+                                                   href="{{ route('admin.dashboard.document.edit', ['item' => $item]) }}"
                                                    target="_blank">
-                                                    {{ $item->name }}
+                                                    {{ str($item->name)->replace('_', ' ') }}
                                                 </a>
                                             </p>
                                         </div>
+                                    </div>
+                                </x-admin.quotes.cell>
+
+                                <x-admin.quotes.cell class="bg-gray-50 border border-gray-400">
+                                    <div class="text-center whitespace-nowrap">
+                                        {{ $item->auto_page_count }}
+                                    </div>
+                                </x-admin.quotes.cell>
+
+                                <x-admin.quotes.cell class="bg-gray-50 border border-gray-400">
+                                    <div class="text-center whitespace-nowrap">
+                                        {{ $item->manual_page_count }}
                                     </div>
                                 </x-admin.quotes.cell>
 

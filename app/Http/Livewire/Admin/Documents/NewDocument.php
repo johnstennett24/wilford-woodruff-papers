@@ -10,6 +10,8 @@ class NewDocument extends Component
 {
     public Item $item;
 
+    public $section_count = 0;
+
     public $type;
 
     public $template;
@@ -23,6 +25,7 @@ class NewDocument extends Component
         $this->item = new Item();
 
         $this->types = Type::query()
+            ->whereNull('type_id')
             ->orderBy('name', 'ASC')
             ->get();
 
@@ -36,13 +39,15 @@ class NewDocument extends Component
                 'Histories' => 'H',
                 'Legal' => 'L',
                 'Mission' => 'M',
+                'Personal' => 'I',
                 'Political/Government' => 'P',
-                'Temple' => 'T',
                 'Religious' => 'R',
+                'Temple' => 'T',
             ],
             'Autobiographies' => 'A',
             'Daybooks' => 'DB',
             'Discourses' => 'D',
+            'Journals' => 'J',
             'Journal Sections' => 'J',
             'Letters' => 'LE',
         ];

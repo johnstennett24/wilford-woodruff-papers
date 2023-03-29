@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Vormkracht10\LaravelOpenGraphImage\Http\Controllers\LaravelOpenGraphImageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -75,6 +76,11 @@ Route::get('/about/editorial-method', [\App\Http\Controllers\AboutController::cl
 Route::get('/about/frequently-asked-questions', [\App\Http\Controllers\AboutController::class, 'faqs'])->name('about.frequently-asked-questions');
 Route::get('/contact-us', [\App\Http\Controllers\AboutController::class, 'contact'])->name('contact-us');
 Route::get('/sitemap.xml', \App\Http\Controllers\SitemapController::class)->name('sitemap');
+Route::get('/opengraph', function () {
+    return view('open-graph-image::template', [
+        'title' => null,
+    ]);
+});
 
 if (app()->environment(['development', 'local'])) {
     Route::get('/search', [\App\Http\Controllers\LandingAreasController::class, 'search'])->name('landing-areas.search');
@@ -215,6 +221,10 @@ Route::group(['middleware' => ['role:Super Admin|Editor']], function () {
         ->name('admin.quotes.search');
 
     Route::middleware(['auth:sanctum', 'verified'])
+        ->get('/admin/search/people', App\Http\Livewire\Admin\People\Search::class)
+        ->name('admin.people.search');
+
+    Route::middleware(['auth:sanctum', 'verified'])
         ->get('/admin/dashboard/quotes/{quote}', [\App\Http\Controllers\Admin\QuoteController::class, 'show'])
         ->name('admin.dashboard.quotes.show');
 
@@ -289,4 +299,16 @@ Route::group(['middleware' => ['role:Super Admin|Editor']], function () {
     Route::middleware(['auth:sanctum', 'verified'])
         ->get('/admin/search/documents', \App\Http\Livewire\Admin\Documents\Search::class)
         ->name('admin.documents.search');
+
+    Route::middleware(['auth:sanctum', 'verified'])
+        ->get('/admin/exports', \App\Http\Livewire\Admin\Exports::class)
+        ->name('admin.exports');
 });
+
+if (app()->environment('local')) {
+    Route::get('open-graph-image.jpg/preview', [LaravelOpenGraphImageController::class, '__invoke'])->name('open-graph-image.html');
+}
+
+Route::get('open-graph-image.jpg', [LaravelOpenGraphImageController::class, '__invoke'])->name('open-graph-image.file');
+
+Route::view('test-og-image', 'public.test');
